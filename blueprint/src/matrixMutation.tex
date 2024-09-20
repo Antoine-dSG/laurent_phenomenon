@@ -2,16 +2,20 @@
 
 % Definition of skew-symmetrisable matrices
 \begin{definition}
-    An $n\times n$ matrix $B = (b_{i,j})$ with integer entries is called 
+    \label{def:mutationMatrix}
+    1) An $n\times n$ matrix $B = (b_{i,j})$ with (say) rational entries is called 
     \emph{skew-symmetrisable} if there exists a diagonal matrix $D = {\rm diag}(d_1, \ldots, d_n)$ 
     with $d_i \in \mathbb{Z}_{>0}$ such that $DB$ is skew-symmetric, i.e. 
     \[
         d_ib_{i,j} = -d_jb_{j,i}, \qquad \forall i,j \in [1,n].
     \]
+
+    2) A mutation matrix is a skew-symmetrisable matrix with integer entries.
 \end{definition}
 
 % Definition of mutation of skew-symmetrisable matrices
 \begin{definition}
+    \label{def:matrixMutation}
     Let $B$ be an $n \times n$ skew-symmetrisable matrix. The \emph{mutation} of 
     $B$ in direction $k \in [1,n]$ is the matrix $\mu_k(B) = (b'_{i,j})$ defined by
     \[
@@ -25,14 +29,15 @@
 \end{definition}
 
 % First properties of matrix mutation
-\begin{proposition}
+\begin{lemma}
+    \label{lem:mutationProperties}
     Let $B$ be an $n \times n$ skew-symmetrisable matrix, and fix $k \in [1,n]$. Then the following hold:
     \begin{enumerate}
         \item $\mu_k(B)$ is skew-symmetrisable, with the same diagonal matrix $D$.
         \item $\mu_k(\mu_k(B)) = B$.
         \item If $B$ is skew-symmetric, then $\mu_k(B)$ is skew-symmetric.
     \end{enumerate}
-\end{proposition}
+\end{lemma}
 \begin{proof}
     \begin{enumerate}   
         \item Fix $k \in [1,n]$, and let $i,j \in [1,n]$ be arbitrary. By definition of $\mu_k(B)$ and the 
