@@ -3,7 +3,7 @@
 % Definition of skew-symmetrisable matrices
 \begin{definition}
     An $n\times n$ matrix $B = (b_{i,j})$ with integer entries is called 
-    \emph{skew-symmetrisable} if there exists a diagonal matrix $D = \diag(d_1, \ldots, d_n)$ 
+    \emph{skew-symmetrisable} if there exists a diagonal matrix $D = {\rm diag}(d_1, \ldots, d_n)$ 
     with $d_i \in \mathbb{Z}_{>0}$ such that $DB$ is skew-symmetric, i.e. 
     \[
         d_ib_{i,j} = -d_jb_{j,i}, \qquad \forall i,j \in [1,n].
@@ -38,12 +38,6 @@
         \item Fix $k \in [1,n]$, and let $i,j \in [1,n]$ be arbitrary. By definition of $\mu_k(B)$ and the 
         skew-symmetry of $B$, we have
 \[
-        b_{i,j}' = \begin{cases}
-            -b_{i,j} & \text{if } i = k \text{ or } j = k, \\
-            b_{i,j} + b_{i,k}b_{k,j} & \text{if } b_{i,k} >0 \text{ and } b_{k,j} > 0, \\
-            b_{i,j} - b_{i,k}b_{k,j} & \text{if } b_{i,k} <0 \text{ and } b_{k,j} < 0, \\
-            b_{i,j} & \text{otherwise}
-        \end{cases}, \quad \text{ and } \quad
         b_{j,i}' = \begin{cases}
             -b_{j,i} & \text{if } i = k \text{ or } j = k, \\
             b_{j,i} - b_{j,k}b_{k,i} & \text{if } b_{i,k} >0 \text{ and } b_{k,j} > 0, \\
@@ -66,6 +60,6 @@ Now suppose we are in the second case, i.e. $b_{i,k} > 0$ and $b_{k,j} > 0$. The
 \end{align*}
 The remaining two cases are similar, and we omit them. 
         \item This is a direct computation.
-        \item This follows from 1). 
+        \item This follows from 1. 
     \end{enumerate}
 \end{proof}
