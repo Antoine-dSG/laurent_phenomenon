@@ -1,6 +1,8 @@
 import Mathlib.Algebra.MvPolynomial.Basic
 import Mathlib.Tactic
 
+-- This is heavily inspired by the file MvPolynomials.lean in mathlib.
+
 noncomputable section
 
 open Set Function Finsupp AddMonoidAlgebra
@@ -15,19 +17,26 @@ namespace MvLaurentPolynomial
 -- multivariate polynomial file.
 section Instances
 
+-- If equality in R is decidable and equality in σ is decidable, then equality in
+-- `MvLaurentPolynomial σ R` is decidable
 instance decidableEqMvLaurentPolynomial [CommSemiring R] [DecidableEq σ] [DecidableEq R] :
     DecidableEq (MvLaurentPolynomial σ R) :=
   Finsupp.instDecidableEq
 
+-- The set of MvLaurentPolynomials indexed by σ with coefficients in R forms a `comm_semiring`.
 instance commSemiring [CommSemiring R] : CommSemiring (MvLaurentPolynomial σ R) :=
   AddMonoidAlgebra.commSemiring
 
+-- Proof that `MvLaurentPolynomial σ R` is non-empty
 instance inhabited [CommSemiring R] : Inhabited (MvLaurentPolynomial σ R) :=
   ⟨0⟩
 
+-- An action by a monoid on the coefficients induces an action on the commutative semiring of multivariate
+-- Laurent polynomials.
 instance distribuMulAction [Monoid R] [CommSemiring S₁] [DistribMulAction R S₁] :
     DistribMulAction R (MvLaurentPolynomial σ S₁) :=
   AddMonoidAlgebra.distribMulAction
+
 
 instance smulZeroClass [CommSemiring S₁] [SMulZeroClass R S₁] :
     SMulZeroClass R (MvLaurentPolynomial σ S₁) :=
@@ -69,3 +78,53 @@ instance unique [CommSemiring R] [Subsingleton R] : Unique (MvLaurentPolynomial 
   AddMonoidAlgebra.unique
 
 end Instances
+
+variable [CommSemiring R] [CommSemiring S₁] {p q : MvLaurentPolynomial σ R}
+
+/-- `LaurentMonomial s a` is the Laurent monomial with coefficient `a` and exponents given by `s`  -/
+def LaurentMonomial (s : σ →₀ ℤ) : R →ₗ[R] MvLaurentPolynomial σ R :=
+ lsingle s
+
+theorem single_eq_LaurentMonomial (s : σ →₀ ℤ) (a : R) : Finsupp.single s a = LaurentMonomial s a :=
+  rfl
+
+theorem mul_def : p * q = p.sum fun m a => q.sum fun n b => LaurentMonomial (m + n) (a * b) :=
+  AddMonoidAlgebra.mul_def
+
+/-- `C a` is the constant polynomial with value `a` -/
+def C : R →+* MvLaurentPolynomial σ R :=
+  { singleZeroRingHom with toFun := LaurentMonomial 0 }
+
+variable (R σ)
+
+@[simp]
+theorem algebraMap_eq [CommSemiring R] : algebraMap R (MvLaurentPolynomial σ R) = C :=
+  rfl
+
+variable {R σ}
+
+/-- `X n` is the evaluation of the degree `1` monomial $X_n$. -/
+def X [CommSemiring R] (n : σ) : MvLaurentPolynomial σ R :=
+  LaurentMonomial (Finsupp.single n 1) 1
+
+theorem LaurentMonomial_left_injective [CommSemiring R] {r : R} (hr : r ≠ 0) :
+    Function.Injective fun s : σ →₀ ℤ => LaurentMonomial s r :=
+  Finsupp.single_left_injective hr
+
+-- Two Laurent monomials with the same non-zero coefficient are equal iff they have the same exponents.
+@[simp]
+theorem LaurentMonomial_exp_inj [CommSemiring R] {s t : σ →₀ ℤ} {r : R} (hr : r ≠ 0) :
+    LaurentMonomial s r = LaurentMonomial t r ↔ s = t :=
+  Finsupp.single_left_inj hr
+
+-- Two Laurent monomials with same exponent are equal iff they have the same coefficient.
+@[simp]
+theorem LaurentMonomial_coef_inj [CommSemiring R] {s : σ →₀ ℤ} {r₁ r₂ : R} :
+    LaurentMonomial s r₁ = LaurentMonomial s r₂ ↔ r₁ = r₂ := by
+    constructor
+    intro h
+    rw [←single_eq_LaurentMonomial, ←single_eq_LaurentMonomial] at h
+    apply Finsupp.single_injective s
+    assumption
+    · intro H
+      rw [H]
