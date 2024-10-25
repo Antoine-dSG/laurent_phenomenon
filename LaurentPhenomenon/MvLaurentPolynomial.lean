@@ -91,6 +91,10 @@ theorem single_eq_LaurentMonomial (s : σ →₀ ℤ) (a : R) : Finsupp.single s
 theorem mul_def : p * q = p.sum fun m a => q.sum fun n b => LaurentMonomial (m + n) (a * b) :=
   AddMonoidAlgebra.mul_def
 
+@[simp]
+theorem LaurentMonomial_mul (s s' : σ→₀ℤ) (a a' : R) : LaurentMonomial s a * LaurentMonomial s' a' = LaurentMonomial (s+s') (a*a') := by
+  sorry
+
 /-- `C a` is the constant polynomial with value `a` -/
 def C : R →+* MvLaurentPolynomial σ R :=
   { singleZeroRingHom with toFun := LaurentMonomial 0 }
@@ -128,3 +132,39 @@ theorem LaurentMonomial_coef_inj [CommSemiring R] {s : σ →₀ ℤ} {r₁ r₂
     assumption
     · intro H
       rw [H]
+
+theorem C_apply [CommSemiring R] : (C a : MvLaurentPolynomial σ R) = LaurentMonomial 0 a :=
+  rfl
+
+@[simp]
+theorem C_0 [CommSemiring R] : C 0 = (0 : MvLaurentPolynomial σ R) := map_zero _
+
+@[simp]
+theorem C_1 [CommSemiring R] : C 1 = (1 : MvLaurentPolynomial σ R) :=
+  rfl
+
+@[simp]
+theorem C_mul_LaurentMonomial [CommSemiring R] : C (a : R) * LaurentMonomial s a' = LaurentMonomial s (a*a') := by
+  sorry
+
+@[simp]
+theorem C_add [CommSemiring R] : (C ((a : R) + a') : MvLaurentPolynomial σ R) = C a + C a' := by
+  sorry
+
+@[simp]
+theorem C_mul [CommSemiring R] : (C (a * a') : MvLaurentPolynomial σ R) = C a * C a' := by
+  sorry
+
+@[simp]
+theorem C_pow [CommSemiring R] (a : R) (n : ℕ) : (C (a ^ n) : MvLaurentPolynomial σ R) = C a ^ n := by
+  sorry
+
+theorem C_injective (σ : Type*) (R : Type*) [CommSemiring R] :
+    Function.Injective (C : R → MvLaurentPolynomial σ R) := by sorry
+
+@[simp]
+theorem C_inj {σ : Type*} (R : Type*) [CommSemiring R] (r s : R) :
+    (C r : MvLaurentPolynomial σ R) = C s ↔ r = s := by sorry
+
+theorem C_surjective {R : Type*} [CommSemiring R] (σ : Type*) [IsEmpty σ] :
+    Function.Surjective (C : R → MvLaurentPolynomial σ R) := by sorry
