@@ -88,7 +88,10 @@ def LaurentMonomial (s : σ →₀ ℤ) : R →ₗ[R] MvLaurentPolynomial σ R :
 theorem single_eq_LaurentMonomial (s : σ →₀ ℤ) (a : R) : Finsupp.single s a = LaurentMonomial s a :=
   rfl
 
-theorem mul_def : p * q = p.sum fun m a => q.sum fun n b => LaurentMonomial (m + n) (a * b) := by
+theorem mul_def : p * q =
+p.sum fun m a =>
+  q.sum fun n b =>
+    LaurentMonomial (m + n) (a * b) := by
   apply AddMonoidAlgebra.mul_def
 
 
@@ -181,3 +184,20 @@ theorem C_surjective {R : Type*} [CommSemiring R] (σ : Type*) [IsEmpty σ] :
     simp only [C_apply, ← single_eq_LaurentMonomial, (Finsupp.ext isEmptyElim (α := σ) : a = 0),
     single_eq_same]
     rfl
+
+-- To be added:
+-- 1) Define which elements are invertible in the Laurent polynomial ring.
+
+/-- Divide by `LaurentMonomial 1 s`, discarding terms not divisible by this. -/
+def divLMonomial {R : Type*} [CommSemiring R] (p : MvLaurentPolynomial σ R) (s : σ →₀ ℤ) : MvLaurentPolynomial σ R :=
+  AddMonoidAlgebra.divOf p s
+
+-- Definition in type A₂ :
+def X1 : MvLaurentPolynomial ℕ ℤ := X 1
+def X2 : MvLaurentPolynomial ℕ ℤ := X 2
+def X3 : MvLaurentPolynomial ℕ ℤ := sorry
+  -- (C 1 + X 1)/ (X 2)
+  -- This currently doesn't work
+  -- We need to define division first
+def X4 : MvLaurentPolynomial ℕ ℤ := sorry
+def X5 : MvLaurentPolynomial ℕ ℤ := sorry
