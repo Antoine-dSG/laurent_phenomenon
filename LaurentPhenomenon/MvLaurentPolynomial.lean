@@ -1,5 +1,6 @@
 import Mathlib.Tactic
 import Mathlib.Algebra.MvPolynomial.Basic
+import Mathlib.Algebra.Group.Units
 
 -- This is heavily inspired by the file MvPolynomials.lean in mathlib.
 
@@ -27,6 +28,11 @@ instance decidableEqMvLaurentPolynomial [CommSemiring R] [DecidableEq σ] [Decid
 -- The set of MvLaurentPolynomials indexed by σ with coefficients in R forms a `comm_semiring`.
 instance commSemiring [CommSemiring R] : CommSemiring (MvLaurentPolynomial σ R) :=
   AddMonoidAlgebra.commSemiring
+
+--  A commutative semiring is in particular a commutative monoid. Useful for units
+instance commMonoid [CommSemiring R] : CommMonoid (MvLaurentPolynomial σ R) := by
+  exact inferInstance
+
 
 -- Proof that `MvLaurentPolynomial σ R` is non-empty
 instance inhabited [CommSemiring R] : Inhabited (MvLaurentPolynomial σ R) :=
@@ -186,7 +192,19 @@ theorem C_surjective {R : Type*} [CommSemiring R] (σ : Type*) [IsEmpty σ] :
     rfl
 
 -- To be added:
+variables (R : Type*) [CommSemiring R]
+
 -- 1) Define which elements are invertible in the Laurent polynomial ring.
+theorem LMonomial_IsUnit (s₁ : σ →₀ ℤ) (r₁ r₂ : R) (hr : r₁*r₂ = 1) : ∃ (s₂ : σ →₀ ℤ), LaurentMonomial s₁ r₁ * LaurentMonomial s₂ r₂ = 1 := by
+  use -s₁
+  rw [LaurentMonomial_mul, hr]
+  simp
+  sorry
+
+
+
+
+
 
 /-- Divide by `LaurentMonomial 1 s`, discarding terms not divisible by this. -/
 def divLMonomial {R : Type*} [CommSemiring R] (p : MvLaurentPolynomial σ R) (s : σ →₀ ℤ) : MvLaurentPolynomial σ R :=
