@@ -43,7 +43,7 @@ lemma zeroToFun : (0 : MvLaurentPolynomial σ R).toFun = 0 := by
 
 instance inhabitedOne [CommSemiring R] : Inhabited (MvLaurentPolynomial σ R) :=
   ⟨1⟩
-lemma supportProduct (p q : MvLaurentPolynomial σ R) : (p * q).support ⊆ p.support ∪ q.support :=
+
 
 
 
