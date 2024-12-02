@@ -1,6 +1,7 @@
 import Mathlib.Tactic
 import Mathlib.Algebra.MvPolynomial.Basic
 import Mathlib.Algebra.Group.Units
+import Mathlib.Data.Finsupp.Defs
 
 -- This is heavily inspired by the file MvPolynomials.lean in mathlib.
 
@@ -19,35 +20,55 @@ namespace MvLaurentPolynomial
 -- multivariate polynomial file.
 section Instances
 
--- If equality in R is decidable and equality in σ is decidable, then equality in
--- `MvLaurentPolynomial σ R` is decidable
-instance decidableEqMvLaurentPolynomial [CommSemiring R] [DecidableEq σ] [DecidableEq R] :
-    DecidableEq (MvLaurentPolynomial σ R) :=
-  Finsupp.instDecidableEq
+
 
 -- The set of MvLaurentPolynomials indexed by σ with coefficients in R forms a `comm_semiring`.
 instance commSemiring [CommSemiring R] : CommSemiring (MvLaurentPolynomial σ R) :=
   AddMonoidAlgebra.commSemiring
 
+variable (σ : Type*) (R : Type*) [CommSemiring R]
+variable (a : (MvLaurentPolynomial σ R))
+
+-- Proof that `MvLaurentPolynomial σ R` is non-empty
+instance inhabitedZero [CommSemiring R] : Inhabited (MvLaurentPolynomial σ R) :=
+  ⟨0⟩
+lemma zeroHasEmptySupport : (0 : MvLaurentPolynomial σ R).support = ∅ := by
+  exact rfl
+
+lemma EmptySupportIsZero : (a.support = ∅) ↔ (a = 0) := by
+  exact Finsupp.support_eq_empty
+
+lemma zeroToFun : (0 : MvLaurentPolynomial σ R).toFun = 0 := by
+  exact rfl
+
+instance inhabitedOne [CommSemiring R] : Inhabited (MvLaurentPolynomial σ R) :=
+  ⟨1⟩
+lemma supportProduct (p q : MvLaurentPolynomial σ R) : (p * q).support ⊆ p.support ∪ q.support :=
+
+
+
 --  A commutative semiring is in particular a commutative monoid. Useful for units
 instance commMonoid [CommSemiring R] : CommMonoid (MvLaurentPolynomial σ R) := by
   exact inferInstance
-
-
--- Proof that `MvLaurentPolynomial σ R` is non-empty
-instance inhabited [CommSemiring R] : Inhabited (MvLaurentPolynomial σ R) :=
-  ⟨0⟩
-
--- An action by a monoid on the coefficients induces an action on the commutative semiring of multivariate
--- Laurent polynomials.
+-- If equality in R is decidable and equality in σ is decidable, then equality in
+-- `MvLaurentPolynomial σ R` is decidable
+instance decidableEqMvLaurentPolynomial [CommSemiring R] [DecidableEq σ] [DecidableEq R] :
+    DecidableEq (MvLaurentPolynomial σ R) :=
+  Finsupp.instDecidableEq
+/- An action by a monoid on the coefficients induces an action on the commutative semiring of multivariate
+ Laurent polynomials. -/
 instance distribuMulAction [Monoid R] [CommSemiring S₁] [DistribMulAction R S₁] :
     DistribMulAction R (MvLaurentPolynomial σ S₁) :=
   AddMonoidAlgebra.distribMulAction
 
+/- If the coefficient semiring S₁ has a scalar multiplication by R, then so does the ring of multivariate Laurent polynomials
+ with coefficients in S₁ -/
 instance smulZeroClass [CommSemiring S₁] [SMulZeroClass R S₁] :
     SMulZeroClass R (MvLaurentPolynomial σ S₁) :=
   AddMonoidAlgebra.smulZeroClass
 
+/- If the coefficient semiring S₁ has a faithful multiplication by R, then so does the ring of multivariate Laurent polynomials
+ with coefficients in S₁ -/
 instance faithfulSMul [CommSemiring S₁] [SMulZeroClass R S₁] [FaithfulSMul R S₁] :
     FaithfulSMul R (MvLaurentPolynomial σ S₁) :=
   AddMonoidAlgebra.faithfulSMul
@@ -94,6 +115,10 @@ def LaurentMonomial (s : σ →₀ ℤ) : R →ₗ[R] MvLaurentPolynomial σ R :
 theorem single_eq_LaurentMonomial (s : σ →₀ ℤ) (a : R) : Finsupp.single s a = LaurentMonomial s a :=
   rfl
 
+/- Multiplication of multivariate Laurent Polynomials -/
+/- p.sum fun m a => ... iterates over each term
+of the polynomial p, where m represents the exponents
+of the term and a represents the coefficient.-/
 theorem mul_def : p * q =
 p.sum fun m a =>
   q.sum fun n b =>
@@ -191,15 +216,22 @@ theorem C_surjective {R : Type*} [CommSemiring R] (σ : Type*) [IsEmpty σ] :
     single_eq_same]
     rfl
 
--- To be added:
-variables (R : Type*) [CommSemiring R]
+-- We need to spell out more of the algebraic structure to make this work.
+-- 1) Additive identity of MvLaurentPolynomial
+-- 2) Additive inverse of MvLaurentPolynomial
+-- 3) Multiplicative identity of MvLaurentPolynomial
+-- 4) Multiplicative inverse of MvLaurentMonomial
+-- 5) Determine set of units in MvLaurentPolynomial
+
+variable (R : Type*) [CommSemiring R]
 
 -- 1) Define which elements are invertible in the Laurent polynomial ring.
-theorem LMonomial_IsUnit (s₁ : σ →₀ ℤ) (r₁ r₂ : R) (hr : r₁*r₂ = 1) : ∃ (s₂ : σ →₀ ℤ), LaurentMonomial s₁ r₁ * LaurentMonomial s₂ r₂ = 1 := by
+theorem LMonomial_IsUnit (s₁ : σ →₀ ℤ) (r₁ r₂ : R) (hr : r₁*r₂ = 1) :
+∃ (s₂ : σ →₀ ℤ), LaurentMonomial s₁ r₁ * LaurentMonomial s₂ r₂ = 1 := by
   use -s₁
   rw [LaurentMonomial_mul, hr]
   simp
-  sorry
+  admit
 
 
 
