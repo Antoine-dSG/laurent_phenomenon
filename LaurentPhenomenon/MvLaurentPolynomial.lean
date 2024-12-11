@@ -14,24 +14,165 @@ open scoped Pointwise
 def MvLaurentPolynomial (σ : Type*) (R : Type*) [CommSemiring R] :=
   AddMonoidAlgebra R (σ →₀ ℤ)
 
+/- (σ →₀ ℤ) -/
+/-
+`Finsupp α M`, denoted `α →₀ M`, is the type of functions `f : α → M` such that
+  `f x = 0` for all but finitely many `x`.
+
+structure Finsupp (α : Type*) (M : Type*) [Zero M] where
+  /-- The support of a finitely supported function (aka `Finsupp`). -/
+  support : Finset α
+  /-- The underlying function of a bundled finitely supported function (aka `Finsupp`). -/
+  toFun : α → M
+  /-- The witness that the support of a `Finsupp` is indeed the exact locus where its
+  underlying function is nonzero. -/
+  mem_support_toFun : ∀ a, a ∈ support ↔ toFun a ≠ 0
+-/
+
+-- By definition, AddMonoidAlgebra R M is the type "function from M to R with finite support"
+-- In other words, AddMonoidAlgebra R M is (M →₀ R)
+-- Thus we are saying that AddMonoidAlgebra R (σ →₀ ℤ) is ((σ →₀ ℤ) →₀ R)
+
+-- single (a : G) (b : k) : k[G] := Finsupp.single a b
+-- Finsupp.single {α : Type u_1} {M : Type u_5} [Zero M] (a : α) (b : M) : α →₀ M
+-- single a b is the finitely supported function with value b at a and zero otherwise.
+
+def constantMvLP (σ : Type*) (R : Type*) [CommSemiring R] (r : R) :
+    MvLaurentPolynomial σ R :=
+  Finsupp.single 0 r
+
+-- Define x_n as the Laurent monomial with coefficient 1
+def x (σ : Type*) (n : σ)(R : Type*) [CommSemiring R] : MvLaurentPolynomial σ R :=
+  Finsupp.single (Finsupp.single n 1) 1
+
+
+
+def x' (σ : Type*) (n : σ)(R : Type*) [CommSemiring R] : MvLaurentPolynomial σ R :=
+  AddMonoidAlgebra.single (Finsupp.single n 1) 1
+
+lemma x_eq_x' (σ : Type*) (n : σ) (R : Type*) [CommSemiring R] :
+    x σ n R = x' σ n R := by
+  exact rfl
+
+-- Define the kth power of x_n as the Laurent monomial with coefficient 1
+def x_pow_k (σ : Type*) (n : σ) (R : Type*) [CommSemiring R] (k : ℤ) : MvLaurentPolynomial σ R :=
+  Finsupp.single (Finsupp.single n k) 1
+
+def x'_pow_k (σ : Type*) (n : σ) (R : Type*) [CommSemiring R] (k : ℤ) : MvLaurentPolynomial σ R :=
+  AddMonoidAlgebra.single (Finsupp.single n k) 1
+
+lemma x_pow_k_eq_x'_pow_k (σ : Type*) (n : σ) (R : Type*) [CommSemiring R] (k : ℤ) :
+    x_pow_k σ n R k = x'_pow_k σ n R k := by
+  exact rfl
+
+-- When k =1, the kth power of x_n is just x_n
+lemma x_pow_1_eq_x (σ : Type*) (n : σ) (R : Type*) [CommSemiring R] :
+    x_pow_k σ n R 1 = x σ n R := by
+  exact rfl
+
+
 
 namespace MvLaurentPolynomial
--- We list a few instances for multivariate Laurent polynomials. These are copied from the
--- multivariate polynomial file.
 section Instances
-
 
 
 -- The set of MvLaurentPolynomials indexed by σ with coefficients in R forms a `comm_semiring`.
 instance commSemiring [CommSemiring R] : CommSemiring (MvLaurentPolynomial σ R) :=
   AddMonoidAlgebra.commSemiring
 
+lemma x_times_x_pow_neg_1_eq_one (σ : Type*) (n : σ) (R : Type*) [CommSemiring R] :
+    x σ n R * x_pow_k σ n R (-1) = 1 := by
+    rw [x_eq_x',x_pow_k_eq_x'_pow_k]
+    unfold x' x'_pow_k
+    rw [AddMonoidAlgebra.single_mul_single]
+    simp
+    exact rfl
+
+
+lemma x_pow_neg_1_times_x_eq_one (σ : Type*) (n : σ) (R : Type*) [CommSemiring R] :
+    x_pow_k σ n R (-1) * x σ n R = 1 := by
+    rw [x_eq_x',x_pow_k_eq_x'_pow_k]
+    unfold x' x'_pow_k
+    rw [AddMonoidAlgebra.single_mul_single]
+    simp
+    exact rfl
+
+
 variable (σ : Type*) (R : Type*) [CommSemiring R]
 variable (a : (MvLaurentPolynomial σ R))
+
+-- The unit (i.e. the quadruple) associated to the monomial x_n
+def x_unit (σ : Type*) (n : σ) (R : Type*) [CommSemiring R] : Units (MvLaurentPolynomial σ R) :=
+  ⟨x σ n R, x_pow_k σ n R (-1), x_times_x_pow_neg_1_eq_one σ n R, x_pow_neg_1_times_x_eq_one σ n R⟩
+
+
+-- The x_n's are units
+lemma x_n_are_units (σ : Type*) (R : Type*) [CommSemiring R] :
+  ∀ n : σ, IsUnit (x σ n R) := by
+  intro n
+  unfold x IsUnit
+  use x_unit σ n R
+  have this : ↑(x_unit σ n R) = x σ n R := by
+    exact rfl
+  rw [this]
+  unfold x
+  exact rfl
+
+
+-- Define the inverse of a Laurent monomial
+
+-- Prove that the ring of Laurent polynomials has the structure Inv
+instance : Inv (MvLaurentPolynomial σ R) := by admit
+
+-- Prove that the ring of Laurent polynomials has the structure Div
+instance : Div (MvLaurentPolynomial σ R) := by admit
+
+instance : DivisionMonoid (MvLaurentPolynomial σ R) := by admit
+
+
+--  A commutative semiring is in particular a commutative monoid. Useful for units
+instance commMonoid [CommSemiring R] : CommMonoid (MvLaurentPolynomial σ R) := by
+  exact inferInstance
+
+
+lemma inverse_of_monomials (σ : Type*) (n : σ) (R : Type*) [CommSemiring R] : (x σ n R)⁻¹ = x_pow_k σ n R (-1) := by
+  have h₂ : (x σ n R)⁻¹ = (x_unit σ n R)⁻¹.val := by admit
+  rw [h₂]
+  unfold x_unit
+  simp
+
+
+def lower_bounds (σ : Type*) (R : Type*) [CommSemiring R] (n₁ n₂ : σ) : MvLaurentPolynomial σ R :=
+  (1+ x σ n₂ R) * (x σ n₁ R)⁻¹
+
+
+
+-- If equality in R is decidable and equality in σ is decidable, then equality in
+-- `MvLaurentPolynomial σ R` is decidable
+instance decidableEqMvLaurentPolynomial [CommSemiring R] [DecidableEq σ] [DecidableEq R] :
+    DecidableEq (MvLaurentPolynomial σ R) :=
+  Finsupp.instDecidableEq
+
+
+
+
+
+
+
+-- The x_n's are linearly independent
+
 
 -- Proof that `MvLaurentPolynomial σ R` is non-empty
 instance inhabitedZero [CommSemiring R] : Inhabited (MvLaurentPolynomial σ R) :=
   ⟨0⟩
+
+@[simp]
+lemma silly0 (σ : Type*) (R : Type*) [CommSemiring R] :
+(0 : MvLaurentPolynomial σ R) = constantMvLP σ R 0 := by
+  unfold constantMvLP
+  simp
+
+
 lemma zeroHasEmptySupport : (0 : MvLaurentPolynomial σ R).support = ∅ := by
   exact rfl
 
@@ -41,20 +182,29 @@ lemma EmptySupportIsZero : (a.support = ∅) ↔ (a = 0) := by
 lemma zeroToFun : (0 : MvLaurentPolynomial σ R).toFun = 0 := by
   exact rfl
 
+
+
+
 instance inhabitedOne [CommSemiring R] : Inhabited (MvLaurentPolynomial σ R) :=
   ⟨1⟩
 
+@[simp]
+lemma silly1 (σ : Type*) (R : Type*) [CommSemiring R] :
+(1 : MvLaurentPolynomial σ R) = constantMvLP σ R 1 := by
+  exact rfl
 
 
 
---  A commutative semiring is in particular a commutative monoid. Useful for units
-instance commMonoid [CommSemiring R] : CommMonoid (MvLaurentPolynomial σ R) := by
-  exact inferInstance
--- If equality in R is decidable and equality in σ is decidable, then equality in
--- `MvLaurentPolynomial σ R` is decidable
-instance decidableEqMvLaurentPolynomial [CommSemiring R] [DecidableEq σ] [DecidableEq R] :
-    DecidableEq (MvLaurentPolynomial σ R) :=
-  Finsupp.instDecidableEq
+
+
+
+
+
+
+
+
+
+
 /- An action by a monoid on the coefficients induces an action on the commutative semiring of multivariate
  Laurent polynomials. -/
 instance distribuMulAction [Monoid R] [CommSemiring S₁] [DistribMulAction R S₁] :
