@@ -119,7 +119,31 @@ lemma x_n_are_units (σ : Type*) (R : Type*) [CommSemiring R] :
   exact rfl
 
 
--- Define the inverse of a Laurent monomial
+-- Defining the monomial m_i among all functions
+
+def m_i {d : ℕ} (i : Fin d) : Finsupp (Fin d) ℤ :=
+  ⟨{i},λ n ↦ if n = i then 1 else 0, by simp⟩
+
+def m_i_neg {d : ℕ} (i : Fin d) : Finsupp (Fin d) ℤ :=
+  ⟨{i},λ n ↦ if n = i then -1 else 0, by simp⟩
+
+-- Single monomial with coefficient 1
+def x_i {d : ℕ} (i : Fin d) : MvLaurentPolynomial (Fin d) ℤ :=
+  ⟨{m_i i}, λ n ↦ if n = (m_i i) then 1 else 0, by simp⟩
+
+def x_i_inv {d : ℕ} (i : Fin d) : MvLaurentPolynomial (Fin d) ℤ :=
+  ⟨{m_i_neg i}, λ n ↦ if n = (m_i_neg i) then 1 else 0, by simp⟩
+
+-- It is best to use the finsupp API in order to avoid having to unfold the definitions...
+
+-- Non-zero monomial with coefficient k
+def x_i_coeff_k (d : ℕ) (i : Fin d) (k : ℤ) (h : ¬k = 0) : MvLaurentPolynomial (Fin d) ℤ := by
+  exact ⟨{m_i i}, λ n ↦ if n = (m_i i) then k else 0, by simp; apply h⟩
+
+-- This is how we write the lower bound variable (1 + x₂)/x₁
+def lower_bound (d : ℕ) (i₁ i₂ : Fin d) : MvLaurentPolynomial (Fin d) ℤ :=
+  (1 + (x_i i₂))*(x_i_inv i₁)
+
 
 -- Prove that the ring of Laurent polynomials has the structure Inv
 instance : Inv (MvLaurentPolynomial σ R) := by admit
@@ -142,7 +166,8 @@ lemma inverse_of_monomials (σ : Type*) (n : σ) (R : Type*) [CommSemiring R] : 
   simp
 
 
-def lower_bounds (σ : Type*) (R : Type*) [CommSemiring R] (n₁ n₂ : σ) : MvLaurentPolynomial σ R :=
+def lower_bounds (σ : Type*) (R : Type*) [CommSemiring R] (n₁ n₂ : σ) :
+MvLaurentPolynomial σ R :=
   (1+ x σ n₂ R) * (x σ n₁ R)⁻¹
 
 
