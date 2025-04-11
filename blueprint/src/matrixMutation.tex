@@ -1,0 +1,70 @@
+\chapter{Matrix mutation}
+
+% Definition of skew-symmetrisable matrices
+\begin{definition}
+    \label{def:mutationMatrix}
+    1) An $n\times n$ matrix $B = (b_{i,j})$ with (say) rational entries is called 
+    \emph{skew-symmetrisable} if there exists a diagonal matrix $D = {\rm diag}(d_1, \ldots, d_n)$ 
+    with $d_i \in \mathbb{Z}_{>0}$ such that $DB$ is skew-symmetric, i.e. 
+    \[
+        d_ib_{i,j} = -d_jb_{j,i}, \qquad \forall i,j \in [1,n].
+    \]
+
+    2) A mutation matrix is a skew-symmetrisable matrix with integer entries.
+\end{definition}
+
+% Definition of mutation of skew-symmetrisable matrices
+\begin{definition}
+    \label{def:matrixMutation}
+    Let $B$ be an $n \times n$ skew-symmetrisable matrix. The \emph{mutation} of 
+    $B$ in direction $k \in [1,n]$ is the matrix $\mu_k(B) = (b'_{i,j})$ defined by
+    \[
+        b_{i,j}' = \begin{cases}
+            -b_{i,j} & \text{if } i = k \text{ or } j = k, \\
+            b_{i,j} + b_{i,k}b_{k,j} & \text{if } b_{i,k} >0 \text{ and } b_{k,j} > 0, \\
+            b_{i,j} - b_{i,k}b_{k,j} & \text{if } b_{i,k} <0 \text{ and } b_{k,j} < 0, \\
+            b_{i,j} & \text{otherwise.}
+        \end{cases}
+    \]
+\end{definition}
+
+% First properties of matrix mutation
+\begin{lemma}
+    \label{lem:mutationProperties}
+    Let $B$ be an $n \times n$ skew-symmetrisable matrix, and fix $k \in [1,n]$. Then the following hold:
+    \begin{enumerate}
+        \item $\mu_k(B)$ is skew-symmetrisable, with the same diagonal matrix $D$.
+        \item $\mu_k(\mu_k(B)) = B$.
+        \item If $B$ is skew-symmetric, then $\mu_k(B)$ is skew-symmetric.
+    \end{enumerate}
+\end{lemma}
+\begin{proof}
+    \begin{enumerate}   
+        \item Fix $k \in [1,n]$, and let $i,j \in [1,n]$ be arbitrary. By definition of $\mu_k(B)$ and the 
+        skew-symmetry of $B$, we have
+\[
+        b_{j,i}' = \begin{cases}
+            -b_{j,i} & \text{if } i = k \text{ or } j = k, \\
+            b_{j,i} - b_{j,k}b_{k,i} & \text{if } b_{i,k} >0 \text{ and } b_{k,j} > 0, \\
+            b_{j,i} + b_{j,k}b_{k,i} & \text{if } b_{i,k} <0 \text{ and } b_{k,j} < 0, \\
+            b_{j,i} & \text{otherwise.}
+        \end{cases}
+\]
+Suppose we are in the first case, i.e. $i=k$ or $j = k$. Then 
+\[
+        d_i b_{i,j}' = d_i (-b_{i,j}) = - d_j (- b_{j,i}) = - d_j b_{j,i}'.
+\]
+Now suppose we are in the second case, i.e. $b_{i,k} > 0$ and $b_{k,j} > 0$. Then
+\begin{align*}
+        d_i b_{i,j}' &= d_i (b_{i,j} + b_{i,k}b_{k,j})\\
+                    &= - d_j b_{j,i} - d_k b_{k,i}b_{k,j} \\
+                    &= - d_j b_{j,i} - d_k b_{k,i}b_{k,j} \\
+                    &= - d_j b_{j,i} + d_j b_{k,i}b_{j,k} \\
+                    &= - d_j (b_{j,i} - b_{j,k}b_{k,i}) \\
+                    &= - d_j b_{j,i}'.
+\end{align*}
+The remaining two cases are similar, and we omit them. 
+        \item This is a direct computation.
+        \item This follows from 1. 
+    \end{enumerate}
+\end{proof}
